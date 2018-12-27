@@ -1,0 +1,166 @@
+<HTML>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"/>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/brands.css" integrity="sha384-1KLgFVb/gHrlDGLFPgMbeedi6tQBLcWvyNUN+YKXbD7ZFbjX6BLpMDf0PJ32XJfX" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/fontawesome.css" integrity="sha384-jLuaxTTBR42U2qJ/pm4JRouHkEDHkVqH0T1nyQXn1mZ7Snycpf6Rl25VBNthU4z0" crossorigin="anonymous">
+<HEAD>
+<style type="text/css">
+    #main {
+        width: 100%;
+    }
+
+    #button-div {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .fab {
+        transform: scale(2);
+    }
+
+    #author {
+        margin-top: 1em;
+        text-align: right;
+        margin-bottom: 1em;
+    }
+
+    #quote-box {
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 4em;
+        max-width: 40em;
+        padding: 3em;
+        border: 1px solid black;
+        border-radius: 2em;
+        display: flex;
+        flex-direction: column;
+
+        font-family: sans-serif;
+    }
+
+    #new-quote {
+        width: 10em;
+    }
+</style>
+</HEAD>
+<BODY>
+<div id="main"></div>
+<script
+  src="https://code.jquery.com/jquery-3.3.1.min.js"
+  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+  crossorigin="anonymous"></script>
+<script src="https://cdn.freecodecamp.org/testable-projects-fcc/v1/bundle.js"></script>
+<script src="https://unpkg.com/babel-standalone@6.26.0/babel.min.js"></script>
+<script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
+<script type="text/babel">
+let url = "https://api.allorigins.ml/get?method=raw&url=" + encodeURIComponent("https://twitter.com/search?f=tweets&vertical=default&q=the&src=typd") + "&callback=?";
+
+let authors =
+    [
+        "MLK",
+        "Gandhi",
+        "Mother Theresa",
+        "Jesus",
+        "Einstein",
+        "St. Thomas Aquinas",
+        "Plato",
+        "Adam Smith",
+        "Nietzsche",
+        "Aristotle",
+        "Muhammad",
+        "Moses",
+        "Buddha",
+        "St. Augustine",
+        "Isaac Newton",
+        "Confucius",
+        "Walt Whitman",
+        "Thoreau",
+        "Ralph Waldo Emerson",
+        "Immanuel Kant",
+        "Sartre",
+        "Noam Chomsky",
+        "Sun Tzu",
+        "John Locke",
+        "Socrates",
+        "Shakespeare",
+        "Robert Frost",
+        "Emily Dickinson",
+        "Edgar Allen Poe",
+        "Lord Byron",
+        "Oscar Wilde"
+    ];
+
+class GenButton extends React.Component {
+    constructor(props) {
+        super(props);
+    }
+
+    render() {
+        return <button className="btn btn-default" id="new-quote" onClick={this.props.callback}>New quote</button>;
+    }
+}
+
+class QuoteBox extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            quote: ['','','','','',''],
+            author: "",
+            i: 5
+        };
+        this.refreshQuote = this.refreshQuote.bind(this);
+    }
+
+    componentDidMount() {
+        this.refreshQuote();
+    }
+
+    refreshQuote() {
+        let idx = Math.floor(Math.random() * authors.length);
+
+        if (this.state.i >= 5) {
+            let f = (x) => {
+                this.setState({
+                    quote: x,
+                    author: "- " + authors[idx],
+                    i: 0
+                })
+            };
+            $.get(url, function(response) {
+                let tweets = $('.tweet-text', $(response));
+                f(tweets);
+            });
+        } else {
+            this.setState({
+                quote: this.state.quote,
+                author: "- " + authors[idx],
+                i: this.state.i + 1
+            })
+        }
+    }
+
+    render() {
+        return (
+            <div id="quote-box">
+                <span id="text">
+                    {this.state.quote[this.state.i].innerText}
+                </span>
+                <span id="author">
+                    {this.state.author}
+                </span>
+                <div id="button-div">
+                    <a id="tweet-quote" target="_blank" href="http://twitter.com/intent/tweet">
+                        <i className="fab fa-twitter-square"></i>
+                    </a>
+                    <GenButton callback={this.refreshQuote}/>
+                </div>
+            </div>
+        );
+    }
+}
+
+ReactDOM.render(<QuoteBox />, document.getElementById('main'));
+</script>
+</BODY>
+</HTML>
