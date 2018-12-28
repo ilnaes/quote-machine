@@ -88,7 +88,8 @@ let authors =
         "Emily Dickinson",
         "Edgar Allen Poe",
         "Lord Byron",
-        "Oscar Wilde"
+        "Oscar Wilde",
+        "Voltaire"
     ];
 
 class GenButton extends React.Component {
@@ -107,37 +108,61 @@ class QuoteBox extends React.Component {
         this.state = {
             quote: ['','','','','',''],
             author: "",
-            i: 5
+            buffer: [],
+            fetching: false,
+            i: 0
         };
         this.refreshQuote = this.refreshQuote.bind(this);
     }
 
     componentDidMount() {
-        this.refreshQuote();
+        let idx = Math.floor(Math.random() * authors.length);
+
+        let f = (x) => {
+            this.setState({
+                quote: x,
+                author: "- " + authors[idx],
+            })
+        };
+        $.get(url, function(response) {
+            let tweets = $('.tweet-text', $(response));
+            f(tweets);
+        });
     }
 
     refreshQuote() {
         let idx = Math.floor(Math.random() * authors.length);
 
         if (this.state.i >= 5) {
-            let f = (x) => {
-                this.setState({
-                    quote: x,
-                    author: "- " + authors[idx],
-                    i: 0
-                })
-            };
-            $.get(url, function(response) {
-                let tweets = $('.tweet-text', $(response));
-                f(tweets);
-            });
-        } else {
-            this.setState({
-                quote: this.state.quote,
-                author: "- " + authors[idx],
-                i: this.state.i + 1
-            })
+            if (!this.state.fetching) {
+                if (this.state.buffer.length == 0) {
+                    let f = (x) => {
+                        this.setState({
+                            buffer: x,
+                            fetching: false
+                        })
+                    };
+                    $.get(url, function(response) {
+                        let tweets = $('.tweet-text', $(response));
+                        f(tweets);
+                    });
+                    this.setState({ fetching: true });
+                } else {
+                    // switch to buffer
+                    this.setState({
+                        quote: this.state.buffer,
+                        buffer: [],
+                        author: "- "+ authors[idx],
+                        i: 0
+                    });
+                    return
+                }
+            }
         }
+        this.setState({
+            author: "- " + authors[idx],
+            i: this.state.i + 1
+        })
     }
 
     render() {
