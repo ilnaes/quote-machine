@@ -106,7 +106,7 @@ class QuoteBox extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            quote: ['','','','','',''],
+            quote: [],
             author: "",
             buffer: [],
             fetching: false,
@@ -169,7 +169,7 @@ class QuoteBox extends React.Component {
         return (
             <div id="quote-box">
                 <span id="text">
-                    {this.state.quote[this.state.i].innerText}
+                    {this.state.quote.length == 0 ? "Loading pearls of wisdom..." : this.state.quote[this.state.i].innerText}
                 </span>
                 <span id="author">
                     {this.state.author}
